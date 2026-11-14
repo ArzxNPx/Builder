@@ -13,8 +13,11 @@ const axios = require('axios');
   const model = require(modelPath);
   const upscaler = new Upscaler({ model });
 
-  console.log('Downloading image...');
-  const res = await axios.get(IMAGE_URL, { responseType: 'arraybuffer' });
+  console.log('Downloading image from:', IMAGE_URL);
+  const res = await axios.get(IMAGE_URL, { 
+    responseType: 'arraybuffer',
+    headers: { 'User-Agent': 'Mozilla/5.0' } 
+  });
   const imageBuffer = Buffer.from(res.data);
 
   const image = tf.node.decodeImage(imageBuffer, 3);
