@@ -4,27 +4,23 @@ const FormData = require('form-data');
 const sharp = require('sharp');
 
 (async () => {
-  const { IMAGE_URL, SCALE, CHAT_ID, BOT_TOKEN } = process.env;
+  const { SCALE, CHAT_ID, BOT_TOKEN } = process.env;
   const multiplier = parseInt(SCALE.replace('x', '')) || 2;
 
-  console.log('Downloading image...');
-  const res = await axios.get(IMAGE_URL, { responseType: 'arraybuffer' });
-  const imageBuffer = Buffer.from(res.data);
+  // BACA FILE LANGSUNG DARI FOLDER REPO (Tanpa download)
+  console.log('Reading image from local repo...');
+  const imageBuffer = fs.readFileSync('input_image.png');
 
   const metadata = await sharp(imageBuffer).metadata();
   const targetWidth = metadata.width * multiplier;
 
   console.log('Upscaling smoothly...');
   
-  // TRIK ENCHANTED & SOFT (Bebas Piksel)
+  // TRIK ENCHANTED & SOFT
   const pngBuffer = await sharp(imageBuffer)
-    .resize({ width: targetWidth, kernel: 'lanczos3' }) // Resize paling halus
-    .median(3)       // <-- Penghapus piksel kotak-kotak (noise)
-    .sharpen({       // <-- Bikin gambar jadi "enchanted" (tajam tapi lembut)
-      sigma: 1.2,
-      m1: 0.5,
-      m2: 0.5
-    })
+    .resize({ width: targetWidth, kernel: 'lanczos3' }) 
+    .median(3)       
+    .sharpen({ sigma: 1.2, m1: 0.5, m2: 0.5 })
     .png()
     .toBuffer();
 
@@ -35,7 +31,7 @@ const sharp = require('sharp');
   const form = new FormData();
   form.append('chat_id', CHAT_ID);
   form.append('photo', fs.createReadStream('output.png'));
-  form.append('caption', '✅ Sukses! Hasil upscale Soft & Enchanted (Git Mode).');
+  form.append('caption', '✅ Sukses! Hasil upscale Soft & Enchanted.');
 
   await axios.post('https://api.telegram.org/bot' + BOT_TOKEN + '/sendPhoto', form, {
     headers: form.getHeaders()
