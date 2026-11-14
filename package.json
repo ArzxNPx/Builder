@@ -2,8 +2,8 @@
   "name": "upscale-worker",
   "private": true,
   "dependencies": {
-    "axios": "^1.7.7",
     "form-data": "^4.0.1",
-    "sharp": "^0.33.5"
+    "sharp": "^0.33.5",
+    "axios": "^1.7.7"
   }
 }
