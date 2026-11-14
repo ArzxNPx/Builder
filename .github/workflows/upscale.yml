@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       image_url:
-        description: 'URL gambar'
         required: true
       scale:
-        description: '2x atau 4x'
         required: true
-        default: '2x'
+      chat_id:
+        required: true
+      bot_token:
+        required: true
 
 jobs:
   upscale:
@@ -17,22 +18,15 @@ jobs:
     timeout-minutes: 15 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20' 
-
       - name: Install deps
         run: npm install
-
       - name: Run upscale
         run: node upscale.js
         env:
           IMAGE_URL: ${{ github.event.inputs.image_url }}
           SCALE: ${{ github.event.inputs.scale }}
-
-      - name: Upload result
-        uses: actions/upload-artifact@v4
-        with:
-          name: upscaled-image
-          path: output.png
+          CHAT_ID: ${{ github.event.inputs.chat_id }}
+          BOT_TOKEN: ${{ github.event.inputs.bot_token }}
