@@ -2,10 +2,8 @@
   "name": "upscale-worker",
   "private": true,
   "dependencies": {
-    "@tensorflow/tfjs-node": "^4.20.0",
-    "upscaler": "^1.0.0",
-    "@upscalerjs/esrgan-slim": "^1.0.0",
     "axios": "^1.7.7",
-    "form-data": "^4.0.1"
+    "form-data": "^4.0.1",
+    "sharp": "^0.33.5"
   }
 }
