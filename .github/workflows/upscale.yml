@@ -26,7 +26,6 @@ jobs:
       - name: Run upscale
         run: node upscale.js
         env:
-          IMAGE_URL: ${{ github.event.inputs.image_url }}
           SCALE: ${{ github.event.inputs.scale }}
           CHAT_ID: ${{ github.event.inputs.chat_id }}
           BOT_TOKEN: ${{ github.event.inputs.bot_token }}
