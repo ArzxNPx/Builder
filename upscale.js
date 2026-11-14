@@ -1,38 +1,41 @@
 const fs = require('fs');
-const tf = require('@tensorflow/tfjs-node');
-const Upscaler = require('upscaler/node');
 const axios = require('axios');
 const FormData = require('form-data');
+const sharp = require('sharp');
 
 (async () => {
   const { IMAGE_URL, SCALE, CHAT_ID, BOT_TOKEN } = process.env;
-  const modelPath = SCALE === '4x'
-    ? '@upscalerjs/esrgan-slim/4x'
-    : '@upscalerjs/esrgan-slim/2x';
-
-  console.log('Loading model:', modelPath);
-  const model = require(modelPath);
-  const upscaler = new Upscaler({ model });
+  const multiplier = parseInt(SCALE.replace('x', '')) || 2;
 
   console.log('Downloading image...');
   const res = await axios.get(IMAGE_URL, { responseType: 'arraybuffer' });
   const imageBuffer = Buffer.from(res.data);
 
-  const image = tf.node.decodeImage(imageBuffer, 3);
-  console.log('Upscaling...');
-  const tensor = await upscaler.upscale(image);
-  const png = await tf.node.encodePng(tensor);
-  fs.writeFileSync('output.png', png);
+  const metadata = await sharp(imageBuffer).metadata();
+  const targetWidth = metadata.width * multiplier;
 
-  image.dispose();
-  tensor.dispose();
+  console.log('Upscaling smoothly...');
+  
+  // TRIK ENCHANTED & SOFT (Bebas Piksel)
+  const pngBuffer = await sharp(imageBuffer)
+    .resize({ width: targetWidth, kernel: 'lanczos3' }) // Resize paling halus
+    .median(3)       // <-- Penghapus piksel kotak-kotak (noise)
+    .sharpen({       // <-- Bikin gambar jadi "enchanted" (tajam tapi lembut)
+      sigma: 1.2,
+      m1: 0.5,
+      m2: 0.5
+    })
+    .png()
+    .toBuffer();
+
+  fs.writeFileSync('output.png', pngBuffer);
   console.log('Upscale done, sending back to Telegram...');
 
   // --- KIRIM BALIK KE TELEGRAM ---
   const form = new FormData();
   form.append('chat_id', CHAT_ID);
   form.append('photo', fs.createReadStream('output.png'));
-  form.append('caption', '✅ Sukses! Hasil upscale AI via GitHub Actions.');
+  form.append('caption', '✅ Sukses! Hasil upscale Soft & Enchanted (Git Mode).');
 
   await axios.post('https://api.telegram.org/bot' + BOT_TOKEN + '/sendPhoto', form, {
     headers: form.getHeaders()
