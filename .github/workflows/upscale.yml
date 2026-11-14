@@ -14,12 +14,14 @@ on:
 jobs:
   upscale:
     runs-on: ubuntu-latest
+    timeout-minutes: 15 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18' 
+          cache: 'npm'
 
       - name: Install deps
         run: npm install
