@@ -3,14 +3,10 @@ name: AI Upscale Worker
 on:
   workflow_dispatch:
     inputs:
-      image_url:
-        required: true
-      scale:
-        required: true
-      chat_id:
-        required: true
-      bot_token:
-        required: true
+      image_url: { required: true }
+      scale: { required: true }
+      chat_id: { required: true }
+      bot_token: { required: true }
 
 jobs:
   upscale:
@@ -19,12 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '20' 
-      - name: Install deps
-        run: npm install
-      - name: Run upscale
-        run: node upscale.js
+        with: { node-version: '20' }
+      - run: npm install
+      - run: node upscale.js
         env:
           SCALE: ${{ github.event.inputs.scale }}
           CHAT_ID: ${{ github.event.inputs.chat_id }}
