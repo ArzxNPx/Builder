@@ -1,0 +1,31 @@
+name: ASCII Video Worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      chat_id: { required: true }
+      bot_token: { required: true }
+      speed: { required: true }
+      detail: { required: true }
+      charset: { required: true }
+      invert: { required: true }
+      color: { required: true }
+
+jobs:
+  render_ascii:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30 
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm install
+      - run: node ascii_video.js
+        env:
+          CHAT_ID: ${{ github.event.inputs.chat_id }}
+          BOT_TOKEN: ${{ github.event.inputs.bot_token }}
+          SPEED: ${{ github.event.inputs.speed }}
+          DETAIL: ${{ github.event.inputs.detail }}
+          CHARSET: ${{ github.event.inputs.charset }}
+          INVERT: ${{ github.event.inputs.invert }}
+          COLOR: ${{ github.event.inputs.color }}
